@@ -7,29 +7,30 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Server {
-    
-    public void run() throws IOException, UnknownHostException{
-        int port = 8010;
-        ServerSocket socket = new ServerSocket(port);
-        socket.setSoTimeout(20000);
-        while(true){
-            System.out.println("Server is listening on port: "+port);
-            Socket acceptedConnection = socket.accept();
-            System.out.println("Connected to "+acceptedConnection.getRemoteSocketAddress());
-            PrintWriter toClient = new PrintWriter(acceptedConnection.getOutputStream(), true);
-            BufferedReader fromClient = new BufferedReader(new InputStreamReader(acceptedConnection.getInputStream()));
-            toClient.println("Hello World from the server");
+
+    public void run() throws IOException, UnknownHostException {
+        int serverPort = 8010;
+        ServerSocket serverSocket = new ServerSocket(serverPort);
+        serverSocket.setSoTimeout(20000); // 20-second timeout
+
+        while (true) {
+            System.out.println("Server is listening on port: " + serverPort);
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("Connected to " + clientSocket.getRemoteSocketAddress());
+
+            PrintWriter outputToClient = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader inputFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            outputToClient.println("Hello World from the server");
         }
     }
 
-    public static void main(String[] args){
-        Server server = new Server();
-        try{
-            server.run();
-        }catch(Exception ex){
-            // print the exceptions 
-            ex.printStackTrace();
+    public static void main(String[] args) {
+        Server serverInstance = new Server();
+        try {
+            serverInstance.run();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
-
 }
