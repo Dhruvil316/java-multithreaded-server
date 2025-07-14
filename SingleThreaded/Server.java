@@ -27,6 +27,7 @@ public class Server {
         try{
             server.run();
         }catch(Exception ex){
+            // print the exceptions 
             ex.printStackTrace();
         }
     }
