@@ -9,32 +9,40 @@ import java.net.UnknownHostException;
 
 public class Client {
     
-    public Runnable getRunnable() throws UnknownHostException, IOException {
-        return new Runnable() {
-            @Override
-            public void run() {
-                int port = 8010;
-                try {
-                    InetAddress address = InetAddress.getByName("localhost");
-                    Socket socket = new Socket(address, port);
-                    try (
-                        PrintWriter toSocket = new PrintWriter(socket.getOutputStream(), true);
-                        BufferedReader fromSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-                    ) {
-                        toSocket.println("Hello from Client " + socket.getLocalSocketAddress());
-                        String line = fromSocket.readLine();
-                        System.out.println("Response from Server " + line);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    // The socket will be closed automatically when leaving the try-with-resources block
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                
+    public Runnable getRunnable() {
+
+    return () -> {
+        Socket socket = null;
+        PrintWriter toSocket = null;
+        BufferedReader fromSocket = null;
+
+        try {
+            socket = new Socket("localhost", 8010);
+
+            toSocket = new PrintWriter(socket.getOutputStream(), true);
+            fromSocket = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+
+            toSocket.println("Hello from Client " + socket.getLocalSocketAddress());
+
+            String line = fromSocket.readLine();
+            System.out.println("Response from Server " + line);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fromSocket != null) fromSocket.close();
+                if (toSocket != null) toSocket.close();
+                if (socket != null) socket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        };
-    }
+        }
+    };
+}
+
     
     public static void main(String[] args){
         Client client = new Client();
